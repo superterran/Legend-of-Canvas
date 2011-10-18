@@ -1,0 +1,398 @@
+<!DOCTYPE>
+<html>
+<!--
+
+The Legend of Canvas
+by superterran 10/18/11
+
+NOTE: might need to hit refresh once or twice if you see white squares.
+
+This is a simple demo I'm building to learn how to make a game engine.
+I've never built a map based game so I thought it'd be fun to start with
+something simple.
+
+I'm going for a Zelda 3 vibe. Basically the level is a grid, the
+characters are sprites rendered ontop of that. The characters
+move one grid space each movement, and everything is stored
+in an array as plain-text maps. The enemies are stored in the same
+array as the maps. You can view-source the page and see it all.
+
+Use arrow keys to move Yellow link-block around. In the future,
+he'll do more than just erase the level, I swear!
+
+This is based on JavaScript (no jQuery... hoping to keep
+it that way) and HTML5 utilizing Canvas.
+
+-->
+
+<head>
+<title>The Legend of Canvas</title>
+<link rel = "stylesheet" href = "style.css">
+</head>
+<body onLoad = "init()" onkeydown="player_move(event)">
+
+
+
+<center>
+<canvas id="stage" width="650" height="500" style="border:1px solid #c3c3c3;" >
+Your browser does not support the canvas element.
+</canvas>
+
+<p>Use Arrow Keys to Move</p>
+
+<p><sub>HTML5/JavaScript Requires FF/Chrome/Safari</sub></p>
+</center>
+<script type="text/javascript">
+
+var entryx = 1;
+var entryy = 1;
+
+var thismap = new Array;
+
+var lastmap = 1;
+var mapnum = 0;
+var map = new Array;
+/*
+
+MAP LEGEND
+
+- level -
+
+r = wall block
+g = fire pit
+b = wall block
+e = entry point
+numbers - doors (exit points)
+
+- enemies - 
+
+a = blue dude
+
+*/
+
+
+
+map[0] = ''
++'rrrrrrrrrrrrr|'
++'r           r|'
++'r  g  a  g  r|'
++'r           r|'
++'2     b     r|'
++'r           r|'
++'r  g     g  r|'
++'r           r|'
++'r     e     r|'
++'rrrrrr1rrrrrr';
+
+map[1] = ''
++'rrrrrr0rrrrrr|'
++'r     e     r|'
++'r           r|'
++'r     g     r|'
++'3           r|'
++'r  g  b  g  r|'
++'r           r|'
++'r     g     r|'
++'r           r|'
++'rrrrrrrrrrrrr|';
+
+map[2] = ''
++'rrrrrrrrrrrrr|'
++'r  g        r|'
++'r           r|'
++'r     g     r|'
++'r           0|'
++'r  g        r|'
++'r           r|'
++'r     g     r|'
++'r           r|'
++'rrrrrr3rrrrr|';
+
+map[3] = ''
++'rrrrrr2rrrrrr|'
++'r  g        r|'
++'r           r|'
++'r     g     r|'
++'r           1|'
++'r  g        r|'
++'r           r|'
++'r     g    rr|'
++'r        rrrr|'
++'rrrrrrrrrrrrr|';
+
+
+
+var enemyx;
+var enemyy;
+var oldx = 1;
+var oldy = 1;
+var cellx;
+var celly;
+var justentered = false;
+thismap = new Array (10);
+for (i = 0; i < thismap . length; ++ i)
+	thismap [i] = new Array (13);
+
+function init() {
+
+
+
+load_stage()
+
+player(entryx, entryy);
+
+character(name, enemyx, enemyy);
+
+
+
+}
+
+
+function player(x, y, who) {
+
+	color = stage_color(x,y,thismap);
+
+	var charx = x * 50;
+	var chary = y * 50;
+
+	var c=document.getElementById("stage");
+	var player = c.getContext("2d");
+
+	player.clearRect(oldx,oldy,50,50);
+
+	var img = new Image();
+	img.src = color;
+	player.drawImage(img,oldx,oldy,50,50);
+
+
+/*	player.fillStyle="#FFFF00";
+	player.fillRect(charx,chary,50,50);
+*/
+
+	img.src = 'sprites/link-down.png';
+	player.drawImage(img,charx,chary,50,50);
+	
+	oldx = x*50;
+	oldy = y*50;
+}
+
+function player_move(e) {
+keynum = e.which;
+
+// left = 37
+// up = 38
+// right = 39
+// down = 40
+// alert('x = ' + entryx + 'y = ' + entryy);
+var xold = entryx;
+var yold = entryy;
+	switch (keynum) {
+		case 37: // left = 37
+			entryx = entryx - 1;
+
+		break;
+
+		case 38: // up = 38
+
+			entryy = entryy - 1;
+		break;
+		case 39: // right = 39
+
+			entryx = entryx + 1;
+
+		break;
+
+		case 40: // down = 40
+
+			entryy = entryy + 1;
+
+		break;
+
+
+	}
+
+if((entryx <= 12) && (entryy <= 9)) { 
+	// don't let characters move outside canvas
+
+	if((thismap[entryy][entryx] == " ") || (thismap[entryy][entryx] == "e")) { 
+		// can i move to this position?
+		player(entryx, entryy);
+
+	} else {
+
+
+		if((!isNaN(thismap[entryy][entryx]))) { 
+		// is this a door? 
+
+
+		lastmap = mapnum;
+		mapnum = thismap[entryy][entryx];
+		
+		load_stage();
+		player(entryx, entryy);	
+
+		
+		} else {
+
+		entryx = xold;
+		entryy = yold;
+
+
+		}
+		
+
+
+
+	}
+} else {
+
+
+
+}
+}
+
+function stage_color(x, y, map) {
+
+	var color;
+	var cases = map[y][x];
+			switch (cases){
+				
+			
+			case "r":
+				color="#FF0000";
+				color = "levels/tile-wall.jpg";
+			break;
+
+			case "g":
+				color = "sprites/firepit.png";
+
+			break;
+
+			case "b":
+
+				color="#0000FF";
+				color = "levels/tile-wall.jpg";
+
+			break;
+
+			case "e":
+			
+
+			case "w":
+			case " ":
+			case "a":	
+			
+			if(cases == "a") {
+
+			enemyx = x;
+			enemyy = y;
+
+			}
+			color="#FFFFFF";
+			color = "levels/tile-floor.jpg";
+
+			break;
+			
+
+
+			case "b":
+
+				color="#000000";
+
+			break;
+			
+
+
+			}
+
+			if(!isNaN(map[y][x])) {
+			
+			if(justentered == true) {
+			if(map[y][x] == lastmap) {
+				oldx = x*50;
+				oldy = y*50;				
+				entryx = x;
+				entryy = y;
+				justentered = false;
+				
+			}
+			}
+
+			color="#FFFFFF";
+			color = "levels/tile-floor.jpg";
+		
+			}
+			
+return color;
+
+}
+
+function load_stage() {
+
+justentered = true;
+
+var cellx = 0;
+var celly = 0;
+
+cell = map[mapnum].split("");
+for(var i=0;i<cell.length;i++){
+
+	if(cell[i] == '|'){
+	
+		var cellx = 0;
+		var celly = celly + 1;
+		thismap[celly] = [];
+
+	} else {		
+
+		thismap[celly][cellx] = cell[i];
+
+		var c=document.getElementById("stage");
+		var cxt =c.getContext("2d");
+		var color = stage_color(cellx, celly, thismap);
+		var curx = cellx*50;
+		var cury = celly*50;
+
+		var img = new Image();
+		img.src = color;
+		cxt.drawImage(img,curx,cury,50,50);
+
+		cellx = cellx + 1;
+
+	}
+
+
+}
+}
+
+
+function character(name, x, y) {
+
+
+	color = "levels/tile-floor.jpg";
+
+	var charx = x * 50;
+	var chary = y * 50;
+
+	var c=document.getElementById("stage");
+	var thischar = c.getContext("2d");
+
+//	thischar.clearRect(oldx,oldy,50,50);
+
+	var img = new Image();
+/*	img.src = color;
+	thischar.drawImage(img,oldx,oldy,50,50);
+*/
+	img.src = "sprites/enemy.png";
+	thischar.drawImage(img,charx,chary,50,50);
+
+
+
+}
+
+
+
+</script>
+
+</body>
+</html>
