@@ -3,9 +3,7 @@
 <!--
 
 The Legend of Canvas
-by superterran 10/18/11
-
-NOTE: might need to hit refresh once or twice if you see white squares.
+by superterran 10/23/2011
 
 This is a simple demo I'm building to learn how to make a game engine.
 I've never built a map based game so I thought it'd be fun to start with
@@ -17,8 +15,10 @@ move one grid space each movement, and everything is stored
 in an array as plain-text maps. The enemies are stored in the same
 array as the maps. You can view-source the page and see it all.
 
-Use arrow keys to move Yellow link-block around. In the future,
-he'll do more than just erase the level, I swear!
+Use arrow keys to move Link around. THe enemy will constantly attack
+you, you can move around the room and watch the enemy get stuck.
+Things are still very basic, broke some things but did some
+refactoring so it looks better.
 
 This is based on JavaScript (no jQuery... hoping to keep
 it that way) and HTML5 utilizing Canvas.
@@ -28,8 +28,9 @@ it that way) and HTML5 utilizing Canvas.
 <head>
 <title>The Legend of Canvas</title>
 <link rel = "stylesheet" href = "style.css">
+<script type="text/javascript" src="sprites.js"></script>
 </head>
-<body onLoad = "init()" onkeydown="player_move(event)">
+<body onLoad = "init()" onkeydown="controller(event)">
 
 
 
@@ -44,14 +45,41 @@ Your browser does not support the canvas element.
 </center>
 <script type="text/javascript">
 
-var entryx = 1;
-var entryy = 1;
+function makewalk() {
 
+//map[mapnum]["enemies"][0]["plusy"] = -1;
+// plr['plusy'] = -5;
+// alert(map[mapnum]["enemies"][0]["x"]);
+}
+
+var block = 50;
+var point = 5;
+var step = 10;
+var xxx = 1;
+
+var plr = new Array;
+plr['x'] = 2*block;
+plr['y'] = 3*block;
+plr['plusx'] = 0;
+plr['plusy'] = 0;
+plr['sprite'] = sprite['player'];
+plr['damage'] = 1;
+plr['health'] = 6;
+plr['maxhealth'] = 6;
+
+
+// link moving down
+
+
+plr['initx'] = 0;
+plr['inity'] = 0;
+plr['leftdoor'] = false;
 var thismap = new Array;
+var blockmap = new Array;
 
 var lastmap = 1;
 var mapnum = 0;
-var map = new Array;
+
 /*
 
 MAP LEGEND
@@ -64,29 +92,36 @@ b = wall block
 e = entry point
 numbers - doors (exit points)
 
-- enemies - 
-
-a = blue dude
-
 */
 
-
-
-map[0] = ''
+var map = new Array;
+var map = [
+	{
+	"terrain":  ''
 +'rrrrrrrrrrrrr|'
 +'r           r|'
-+'r  g  a  g  r|'
++'r  g     g  r|'
 +'r           r|'
 +'2     b     r|'
 +'r           r|'
 +'r  g     g  r|'
 +'r           r|'
-+'r     e     r|'
-+'rrrrrr1rrrrrr';
++'r           r|'
++'rrrrrr1rrrrrr',
+"enemies": [
+{
+"x": 3*block,
+"y": 4.5*block,
+"plusx": 0,
+"plusy": 0,
+"sprite": sprite['bluehardhat']
+}]
 
-map[1] = ''
+}, {
+
+	"terrain":  ''
 +'rrrrrr0rrrrrr|'
-+'r     e     r|'
++'r           r|'
 +'r           r|'
 +'r     g     r|'
 +'3           r|'
@@ -94,9 +129,11 @@ map[1] = ''
 +'r           r|'
 +'r     g     r|'
 +'r           r|'
-+'rrrrrrrrrrrrr|';
++'rrrrrrrrrrrrr|' 
 
-map[2] = ''
+},{
+
+	"terrain":  ''
 +'rrrrrrrrrrrrr|'
 +'r  g        r|'
 +'r           r|'
@@ -106,9 +143,12 @@ map[2] = ''
 +'r           r|'
 +'r     g     r|'
 +'r           r|'
-+'rrrrrr3rrrrr|';
++'rrrrrr3rrrrr|' 
 
-map[3] = ''
+ 
+},{
+
+	"terrain":  ''
 +'rrrrrr2rrrrrr|'
 +'r  g        r|'
 +'r           r|'
@@ -118,138 +158,103 @@ map[3] = ''
 +'r           r|'
 +'r     g    rr|'
 +'r        rrrr|'
-+'rrrrrrrrrrrrr|';
++'rrrrrrrrrrrrr|'
+
+ 
+}];
 
 
+var firstloadoflevel = true;
 
-var enemyx;
-var enemyy;
-var oldx = 1;
-var oldy = 1;
-var cellx;
-var celly;
-var justentered = false;
-thismap = new Array (10);
-for (i = 0; i < thismap . length; ++ i)
-	thismap [i] = new Array (13);
+thismap = new Array (10); for (i = 0; i < thismap . length; ++ i) thismap [i] = new Array (13);
+pointmap = new Array (10*block); for (i = 0; i < blockmap.length; ++ i) blockmap [i] = new Array (13*block);
+
 
 function init() {
 
+setInterval("loop()", 50);
+
+}
+
+function loop() {
+
+	if(firstloadoflevel == true) {
+		// do begining of level stuff
+		
+		justentered = true;
+		load_stage();
 
 
-load_stage()
+		firstloadoflevel = false;
 
-player(entryx, entryy);
 
-character(name, enemyx, enemyy);
+	}
 
+
+// refresh canvas with level
+
+load_stage();
+
+//player
+
+character('player');
+
+// move enemies
+
+for(var z=0;z<map[mapnum]['enemies'].length;z++){
+ 
+character(z);
+
+xxx++;
+}
 
 
 }
 
 
-function player(x, y, who) {
-
-	color = stage_color(x,y,thismap);
-
-	var charx = x * 50;
-	var chary = y * 50;
-
-	var c=document.getElementById("stage");
-	var player = c.getContext("2d");
-
-	player.clearRect(oldx,oldy,50,50);
-
-	var img = new Image();
-	img.src = color;
-	player.drawImage(img,oldx,oldy,50,50);
-
-
-/*	player.fillStyle="#FFFF00";
-	player.fillRect(charx,chary,50,50);
-*/
-
-	img.src = 'sprites/link-down.png';
-	player.drawImage(img,charx,chary,50,50);
-	
-	oldx = x*50;
-	oldy = y*50;
-}
-
-function player_move(e) {
+function controller(e) {
 keynum = e.which;
 
+// space = 32
 // left = 37
 // up = 38
 // right = 39
 // down = 40
-// alert('x = ' + entryx + 'y = ' + entryy);
-var xold = entryx;
-var yold = entryy;
-	switch (keynum) {
-		case 37: // left = 37
-			entryx = entryx - 1;
+//alert(keynum);
 
-		break;
+if(keynum == 37) { // left
 
-		case 38: // up = 38
-
-			entryy = entryy - 1;
-		break;
-		case 39: // right = 39
-
-			entryx = entryx + 1;
-
-		break;
-
-		case 40: // down = 40
-
-			entryy = entryy + 1;
-
-		break;
-
-
-	}
-
-if((entryx <= 12) && (entryy <= 9)) { 
-	// don't let characters move outside canvas
-
-	if((thismap[entryy][entryx] == " ") || (thismap[entryy][entryx] == "e")) { 
-		// can i move to this position?
-		player(entryx, entryy);
-
-	} else {
-
-
-		if((!isNaN(thismap[entryy][entryx]))) { 
-		// is this a door? 
-
-
-		lastmap = mapnum;
-		mapnum = thismap[entryy][entryx];
-		
-		load_stage();
-		player(entryx, entryy);	
-
-		
-		} else {
-
-		entryx = xold;
-		entryy = yold;
-
-
-		}
-		
-
-
-
-	}
-} else {
-
-
+	plr["plusx"] = plr["plusx"]  - step;
+	plr['sprite']['orientation'] = 'left';
 
 }
+
+if(keynum == 38) { // up
+
+	plr["plusy"] = plr["plusy"] - step;
+	plr['sprite']['orientation'] = 'up';
+
 }
+
+if(keynum == 39) { // right 
+
+	plr["plusx"] = plr["plusx"] + step;
+	plr['sprite']['orientation'] = 'right';
+
+}
+
+
+if(keynum == 40) { // left
+
+	plr["plusy"] = plr["plusy"] + step;
+	plr['sprite']['orientation'] = 'down';
+
+}
+
+// alert('x = ' + plr["plusx"] + ', y = ' + plr['plusy']);
+
+}
+
 
 function stage_color(x, y, map) {
 
@@ -282,12 +287,6 @@ function stage_color(x, y, map) {
 			case " ":
 			case "a":	
 			
-			if(cases == "a") {
-
-			enemyx = x;
-			enemyy = y;
-
-			}
 			color="#FFFFFF";
 			color = "levels/tile-floor.jpg";
 
@@ -309,10 +308,11 @@ function stage_color(x, y, map) {
 			
 			if(justentered == true) {
 			if(map[y][x] == lastmap) {
-				oldx = x*50;
-				oldy = y*50;				
-				entryx = x;
-				entryy = y;
+				
+				plr["x"] = x*block;
+				plr["y"] = y*block;
+				plr['initx'] = x*block;
+				plr['inity'] = y*block;
 				justentered = false;
 				
 			}
@@ -327,14 +327,18 @@ return color;
 
 }
 
+
+
 function load_stage() {
 
-justentered = true;
 
+// Draw the level
 var cellx = 0;
 var celly = 0;
 
-cell = map[mapnum].split("");
+
+
+cell = map[mapnum]["terrain"].split("");
 for(var i=0;i<cell.length;i++){
 
 	if(cell[i] == '|'){
@@ -346,6 +350,13 @@ for(var i=0;i<cell.length;i++){
 	} else {		
 
 		thismap[celly][cellx] = cell[i];
+
+			if(firstloadoflevel == true) {
+			if(cell[i] == 'e') {
+			
+				plr["x"] = cellx;
+				plr["y"] = celly;
+			}}
 
 		var c=document.getElementById("stage");
 		var cxt =c.getContext("2d");
@@ -361,36 +372,274 @@ for(var i=0;i<cell.length;i++){
 
 	}
 
-
-}
 }
 
+// render heads up display (health infomation, coinage, etc...
 
-function character(name, x, y) {
+headsupdisplay();
 
 
-	color = "levels/tile-floor.jpg";
+}
 
-	var charx = x * 50;
-	var chary = y * 50;
+
+
+
+function draw(actor, x, y) {
+
+
+sprite = actor['sprite'][actor['sprite']['orientation']][actor['sprite']['step']];
+if(actor['sprite']['step'] == actor['sprite']['orientation'].length - 1) actor['sprite']['step'] = 0; else actor['sprite']['step']++;
+
+
 
 	var c=document.getElementById("stage");
 	var thischar = c.getContext("2d");
+/*	
 
-//	thischar.clearRect(oldx,oldy,50,50);
+*/	
 
-	var img = new Image();
-/*	img.src = color;
-	thischar.drawImage(img,oldx,oldy,50,50);
-*/
-	img.src = "sprites/enemy.png";
-	thischar.drawImage(img,charx,chary,50,50);
+var img = new Image();
+	img.src = sprite;
+	thischar.drawImage(img,x,y,block,block);
+
+
+}
+
+
+
+// new UNIVERSAL move function
+
+function character(id) {
+
+
+actor = character_move(id);
+
+// get new coordinates for move
+	 x = actor["x"];
+	 y = actor["y"];
+
+// draw to screen
+
+	draw(actor, x, y);
+
+
+}
+
+function character_move(name) {
+
+if(name == 'player') {
+	actor = plr;
+
+} else {
+	
+	actor = map[mapnum]['enemies'][name];
+
+
+	if(Math.abs(actor['x'] - plr['x']) < 25 && (Math.abs(actor['y'] - plr['y']) < 25)) { // colision?
+	actor['repulsex'] = 2*block;
+	actor['repulsey'] = 2*block;
+
+	plr['health']--;
+
+	}
+
+   	huntplayer(name);
+
+
+}
+
+
+if(actor['plusy'] > 0) {
+if(actor['repulsey'] > 0) {
+
+actor['plusy'] = actor['plusy'] - block;
+// alert('ouch!');
+actor['repulsey'] = actor['repulsey'] - (step/1.5);
+
+} else {
+
+actor['repulsey'] = 0;
+
+}
+} else {
+
+if(actor['repulsey'] < 0) {
+
+actor['plusy'] = actor['plusy'] + block;
+// alert('ouch!');
+actor['repulsey'] = actor['repulsey'] + (step/1.5);
+
+} else {
+
+actor['repulsey'] = 0;
+
+}
+
+}
+
+
+if(actor['plusx'] > 0) {
+if(actor['repulsex'] > 0) {
+
+actor['plusx'] = actor['plusx'] - block;
+//alert(actor['plusx']);
+actor['repulsex'] = actor['repulsex'] - (step/1.5);
+
+} else {
+
+actor['repulsex'] = 0;
+
+}
+} else {
+
+if(actor['repulsex'] < 0) {
+
+actor['plusx'] = actor['plusx'] + block;
+//alert(actor['plusx']);
+actor['repulsex'] = actor['repulsex'] + (step/1.5);
+
+} else {
+
+actor['repulsex'] = 0;
+
+}
+
+
+}
+
+xl = eval(actor['x']); xl = (xl - xl % block)/block;
+xr = eval(actor['x']+block-1); xr = (xr - xr % block)/block;
+yt = eval(actor['y']); yt = (yt - yt % block)/block;
+yb = eval(actor['y']+block-1); yb = (yb - yb % block)/block;
+
+
+if(actor['plusy'] != 0) {
+
+if(actor['plusy'] < 0) { // is y negative (going up?)
+
+	if((thismap[yt][xl] ==  ' ' || !isNaN(thismap[yt][xl])) && (thismap[yt][xr] ==  ' ' || !isNaN(thismap[yt][xr]))) { // top
+		actor['y'] = actor['y'] - step; 
+		actor['plusy'] = actor['plusy'] + step;
+	}
+
+} else { // is y positive (going down?)
+
+	if((thismap[yb][xl] ==  ' ' || !isNaN(thismap[yb][xl])) && (thismap[yb][xr] ==  ' ' || !isNaN(thismap[yb][xr]))) { // top
+	    actor['y'] = actor['y'] + step; 
+		actor['plusy'] = actor['plusy'] - step;
+
+	}
+
+}
+}
+
+if(actor['plusx'] != 0) {
+
+if(actor['plusx'] < 0) { // is x negative (going left?)
+
+	if((thismap[yb][xl] ==  ' ' || !isNaN(thismap[yb][xl])) && (thismap[yt][xl] ==  ' ' || !isNaN(thismap[yt][xl]))) { // top
+		actor['x'] = actor['x'] - step; 
+		actor['plusx'] = actor['plusx'] + step;
+
+	}
+
+} else { // is x postive (going right?)
+
+	if((thismap[yb][xr] ==  ' ' || !isNaN(thismap[yb][xr])) && (thismap[yt][xr] ==  ' ' || !isNaN(thismap[yt][xr]))) { // top
+		actor['x'] = actor['x'] + step; 
+		actor['plusx'] = actor['plusx'] - step;
+
+	}
+
+
+}
+}
+if(plr['leftdoor'] == true  && !isNaN(thismap[yt][xl]) && thismap[yt][xl] != ' ') {
+	// alert('level change ' + thismap[yt][xl]);
+	firstloadoflevel = true;
+	plr['leftdoor'] = false;
+	lastmap = mapnum;
+	mapnum = thismap[yt][xl];
+
+} else {
+
+if(Math.abs(plr['x'] - plr['initx']) > block) plr['leftdoor'] = true;
+if(Math.abs(plr['y'] - plr['inity']) > block) plr['leftdoor'] = true;
+
+}
+
+
+if(actor['plusx'] == 0 && actor['plusy'] == 0) actor['sprite']['step'] = 0; // return to sprite 0
+
+
+
+
+
+
+actor['plusy'] = actor['plusy'] - step;
+actor['plusx'] = actor['plusx'] - step;
+if(Math.abs(actor['plusy']) > 5) actor['plusy'] = 0;
+if(Math.abs(actor['plusx']) > 5) actor['plusx'] = 0;
+
+
+
+if(name == 'player') {
+
+	plr = actor;
+
+} else {
+	
+	map[mapnum]["enemies"][name] = actor;
+
+}
+
+return actor;
 
 
 
 }
 
 
+function huntplayer(name) {
+
+
+
+
+	actor = map[mapnum]['enemies'][name];
+
+	difx = actor['x'] - plr['x'];
+	dify = actor['y'] - plr['y'];
+
+	
+	if(difx < 0) actor['plusx'] = step; else actor['plusx'] = -step;
+	if(dify < 0) actor['plusy'] = step; else actor['plusy'] = -step;
+
+
+
+
+	map[mapnum]['enemies'][name] = actor;
+}
+
+
+function headsupdisplay() {
+
+   var context = document.getElementById("stage").getContext("2d");
+   context.fillStyle    = '#fff';
+	context.font         = '20px Lucida Sans Unicode';
+	context.textBaseline = 'top';
+    context.fillText(" life: " + plr['health'], 10, 10);
+
+
+    context.fillText(" plusx: " + plr['plusx'], 10, 30);
+    context.fillText(" plusy: " + plr['plusy'], 10, 50);
+
+
+
+    context.fillText(" enemey plusx: " + map[mapnum]['enemies'][0]['repulsex'], 100, 30);
+    context.fillText(" enemey plusy: " + map[mapnum]['enemies'][0]['repulsey'], 100, 50);
+
+
+}
 
 </script>
 
