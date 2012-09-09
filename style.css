@@ -1,4 +1,4 @@
-/**/.fullscreen { display: none; height: 99%; }
+/*.fullscreen { display: none; height: 99%; }*/
 
 body {
 
@@ -25,5 +25,11 @@ body {
     display: block;
     margin-left: auto ;
     margin-right: auto ;
+
+}
+
+#directions {
+
+    margin-top: 60px;
 
 }
