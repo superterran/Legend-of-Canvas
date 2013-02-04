@@ -1,0 +1,25 @@
+{
+    "name": "dungeon",
+
+    "tiles":
+    {
+        " ":    "tile-floor.jpg",
+        "r":    "tile-wall.jpg",
+        "g":    "firepit.png"
+    },
+
+    "levels":
+    {
+        "0":[
+            "rrrrrrrrrrrrr",
+            "r           r",
+            "r  g     g  r",
+            "r           r",
+            "r     g     r",
+            "r           r",
+            "r  g     g  r",
+            "r           r",
+            "rrrrrrrrrrrrr"
+        ]
+    }
+}

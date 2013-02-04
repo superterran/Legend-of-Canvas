@@ -1,0 +1,7 @@
+
+var char = Class.create({
+
+
+
+
+});
