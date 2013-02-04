@@ -24,9 +24,9 @@ var stage = Class.create({
             requestHeaders: {Accept: 'application/json'},
             onSuccess: function(transport){
                 this.level = transport.responseText.evalJSON(); // <-- loads level to memory
-                new PeriodicalExecuter(function(pe) { // stage 'loop'
-                    this.renderStage(); // renders stage
-                }.bind(this), this.step);
+//                new PeriodicalExecuter(function(pe) { // stage 'loop'
+//                    this.renderStage(); // renders stage
+//                }.bind(this), this.step);
             }.bind(this)
         });
         return this.level;
