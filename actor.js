@@ -2,17 +2,20 @@
 var actor = Class.create({
 
     name: null,
+    data: null,
     health: 100,
 
     x: 0,
     y: 0,
 
+    speed: 10,
+
+    tol: 40,
     block: 50,
 
-    data: null,
-
-    speed: 10,
-    tol: 40,
+    exitedDoor: false,
+    orient: 'up',
+    orient_x: 0,
 
     action: 'wasd',
     actions: [],
@@ -37,18 +40,44 @@ var actor = Class.create({
 
     act: function(action) {
 
+
+        if(this.parent.stage.spawnFlag == true) {
+
+            this.parent.stage.spawnFlag = false;
+            this.x = this.parent.stage.spawnPointX;
+            this.y = this.parent.stage.spawnPointY;
+
+        }
+
+        if(this.parent.stage.isDoor(this.x, this.y)) {
+
+            if(this.exitedDoor == true) {
+                var door = this.parent.stage.getTile(this.x,this.y);
+                this.exitedDoor = false;  this.parent.stage.useDoor(door);
+            }
+
+         } else {
+            this.exitedDoor = true;
+        }
+
         if(action) this.action = action;
         this.actions[this.action]();
 
+        // sanity checks to make sure character is always in bounds
+
+        if(this.x < 0) this.x = this.speed;
+        if(this.y < 0) this.y = this.speed;
+        if(this.x > this.parent.stage.width * this.parent.stage.block) this.x = (this.parent.stage.width * this.parent.stage.block) - this.block
+        if(this.y > this.parent.stage.height * this.parent.stage.block) this.y = (this.parent.stage.height * this.parent.stage.block) + this.block;
     },
 
     loadActions: function() {
 
-        this.actions['stop']    = function(){ /* no action */ }.bind(this);
-        this.actions['up']      = function(){ var y = this.y - this.speed; if(this.canMove(this.x, y)){ this.y = y }}.bind(this);
-        this.actions['down']    = function(){ var y = this.y + this.speed; if(this.canMove(this.x, y)){ this.y = y }}.bind(this);
-        this.actions['left']    = function(){ var x = this.x - this.speed; if(this.canMove(x, this.y)){ this.x = x }}.bind(this);
-        this.actions['right']   = function(){ var x = this.x + this.speed; if(this.canMove(x, this.y)){ this.x = x }}.bind(this);
+        this.actions['stop']    = function(){ this.orient_x = 0; /* no action */ }.bind(this);
+        this.actions['up']      = function(){ this.orient = 'up'; var y = this.y - this.speed; if(this.canMove(this.x, y)){ this.y = y }}.bind(this);
+        this.actions['down']    = function(){ this.orient = 'down'; var y = this.y + this.speed; if(this.canMove(this.x, y)){ this.y = y }}.bind(this);
+        this.actions['left']    = function(){ this.orient = 'left'; var x = this.x - this.speed; if(this.canMove(x, this.y)){ this.x = x }}.bind(this);
+        this.actions['right']   = function(){ this.orient = 'right'; var x = this.x + this.speed; if(this.canMove(x, this.y)){ this.x = x }}.bind(this);
         this.actions['wasd']    = function(){
             this.action = 'stop';
             Event.observe(document, 'keydown', function(event){
@@ -60,12 +89,7 @@ var actor = Class.create({
         }.bind(this);
 
     },
-    /**
-     * determines if attempted move is valid
-     * @param x
-     * @param y
-     * @return {Boolean}
-     */
+
     canMove: function(x,y) {
 
         var yy = this.y - y;

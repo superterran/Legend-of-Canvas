@@ -5,22 +5,47 @@
 
         "down":
         {
-            "0":"img/link-down.png"
+            "0":"img/link-down0.png",
+            "1":"img/link-down1.png",
+            "2":"img/link-down2.png",
+            "3":"img/link-down3.png",
+            "4":"img/link-down4.png",
+            "5":"img/link-down5.png",
+            "6":"img/link-down6.png",
+            "7":"img/link-down7.png"
         },
 
         "up":
         {
-            "0":"img/link-up.png"
+            "0":"img/link-up0.png",
+            "1":"img/link-up1.png",
+            "2":"img/link-up2.png",
+            "3":"img/link-up3.png",
+            "4":"img/link-up4.png",
+            "5":"img/link-up5.png",
+            "6":"img/link-up6.png",
+            "7":"img/link-up7.png"
         },
 
         "left":
         {
-            "0":"img/link-left.png"
+            "0":"img/link-left0.png",
+            "1":"img/link-left1.png",
+            "2":"img/link-left2.png",
+            "3":"img/link-left3.png",
+            "4":"img/link-left4.png",
+            "5":"img/link-left5.png",
+            "6":"img/link-left6.png"
         },
 
         "right":
         {
-            "0":"img/link-right.png"
+            "0":"img/link-right0.png",
+            "1":"img/link-right1.png",
+            "2":"img/link-right2.png",
+            "3":"img/link-right3.png",
+            "4":"img/link-right4.png",
+            "5":"img/link-right5.png"
         }
     }
 }

@@ -4,7 +4,7 @@ var engine = Class.create({
 
     stage: null,
     actors: [],
-    step:.08,
+    step:.05,
 
     preload: ['stage.js','actor.js'],
 

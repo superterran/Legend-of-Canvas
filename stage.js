@@ -6,12 +6,14 @@ var stage = Class.create({
     width: 13,
     level: null,
     room: null,
+    lastRoom: null,
     step: 10, // how many refereshes, in seconds
     levelsPath: "levels/",
     canvasName: null,
 
     spawnPointX: 0,
     spawnPointY: 0,
+    spawnFlag: false,
 
     parent: false,
 
@@ -25,6 +27,7 @@ var stage = Class.create({
 
         this.level = this.parent.loadJson("levels/"+name+"/level.json");
         this.room = 0;
+        this.lastRoom = 0;
         this.renderStage();
 
     },
@@ -46,8 +49,10 @@ var stage = Class.create({
 
         actors.each(function(e) {
 
-            this.draw(e.charPath + e.data.sprite['down'][0], e.x, e.y);
-
+            if(!e.data.sprite[e.orient][e.orient_x]) e.orient_x = 0;
+            this.draw(e.charPath + e.data.sprite[e.orient][e.orient_x], e.x, e.y);
+            this.draw(e.charPath + e.data.sprite[e.orient][e.orient_x], e.x, e.y); // renders twice to smooth animations
+            e.orient_x++;
         }.bind(this));
 
     },
@@ -63,7 +68,7 @@ var stage = Class.create({
 
         var x=0;
 
-        map[0].each(function(e){ // loop top to bottom
+        map[this.room].each(function(e){ // loop top to bottom
 
             var y=0;
 
@@ -75,8 +80,13 @@ var stage = Class.create({
                     url = this.levelsPath+name+"/"+tiles[c]; // rest of level
                 } else {
                     url = this.levelsPath+name+"/"+tiles[' ']; // doorway
-                    this.spawnPointY = x*this.block;
-                    this.spawnPointX = y*this.block;
+
+                    if(c == this.lastRoom) {
+
+                        this.spawnPointY = x*this.block;
+                        this.spawnPointX = y*this.block;
+
+                    }
                 }
 
                 this.draw(url, y*this.block, x*this.block);
@@ -92,17 +102,40 @@ var stage = Class.create({
 
     isMovable: function(x, y) {
 
+        var tile = this.getTile(x,y);
+        if(tile == " " || !isNaN(tile)) return true; else return false;
+
+    },
+
+    isDoor: function(x,y) {
+
+      if(this.getTile(x,y) != " ") return true; else false;
+
+    },
+
+    useDoor: function(door) {
+
+      this.spawnFlag = true;
+      this.lastRoom = this.room;
+      this.room = door;
+
+    },
+
+    getTile: function(x, y) {
+
         var xx = this.toBlock(x);
         var yy = this.toBlock(y);
-        var yyy = this.level.levels[this.room][yy];
-        if(yyy.charAt(xx) == " " || !isNaN(yyy.charAt(xx))) return true; else return false;
+        if(this.level.levels[this.room][yy]) {
+            var yyy = this.level.levels[this.room][yy];
+        } else {
+            var yyy = this.level.levels[this.room][yy-1]
+        }
+        if(yyy.charAt(xx)) return yyy.charAt(xx); else return yyy.charAt(xx-1);
 
     },
 
     toBlock: function(xy) {
-
         return Math.floor(xy / this.block);
-
     },
 
     draw: function(imgurl, x, y) {
