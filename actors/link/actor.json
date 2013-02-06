@@ -1,0 +1,26 @@
+{
+    "name":"Linkford",
+
+    "sprite":{
+
+        "down":
+        {
+            "0":"img/link-down.png"
+        },
+
+        "up":
+        {
+            "0":"img/link-up.png"
+        },
+
+        "left":
+        {
+            "0":"img/link-left.png"
+        },
+
+        "right":
+        {
+            "0":"img/link-right.png"
+        }
+    }
+}

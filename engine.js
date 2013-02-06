@@ -3,19 +3,22 @@
 var engine = Class.create({
 
     stage: null,
-    chars: [],
-    step: 1,
+    actors: [],
+    step:.08,
+
+    preload: ['stage.js','actor.js'],
+
 
     initialize: function(name) {
 
+        this.load(); //new stage(name, this);
+        this.stage = new stage(name, this);
 
-        this.chars['p1'] = new char;
+        this.stage.load('dungeon');
 
-        this.stage = new stage(name);
-        this.stage.load('dungeon', this);
+        this.actors[0] = new actor('link', this);
 
         this.loop();
-
 
     },
 
@@ -23,9 +26,37 @@ var engine = Class.create({
 
         new PeriodicalExecuter(function(pe) { // stage 'loop'
 
-            this.stage.renderStage(); // renders stage
+            this.actors[0].act();
 
-        }.bind(this), this.step);
+            this.stage.renderStage(); // renders stage
+            this.stage.renderActors(this.actors); // renders actors
+
+
+        }.bind(this),this.step);
+    },
+
+
+    loadJson: function(url) {
+
+        ajax = new Ajax.Request(url, {
+            asynchronous:false,
+            requestHeaders: {Accept: 'application/json'}
+        });
+
+        return ajax.transport.responseText.evalJSON();
+    },
+
+    load: function() {
+
+        this.preload.each(function(e) {
+
+            script = document.createElement("script");
+            script.type = 'text/javascript';
+            script.src = e;
+            $$('head').first().appendChild(script);
+
+        });
+
     }
 
 });

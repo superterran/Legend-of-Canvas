@@ -6,30 +6,27 @@ var stage = Class.create({
     width: 13,
     level: null,
     room: null,
-    step: 1, // how many refereshes, in seconds
+    step: 10, // how many refereshes, in seconds
     levelsPath: "levels/",
-
     canvasName: null,
 
-    initialize: function(name) {
+    spawnPointX: 0,
+    spawnPointY: 0,
+
+    parent: false,
+
+    initialize: function(name, parent) {
 
         this.buildStage(name);
+        this.parent = parent;
     },
 
     load: function(name) {
 
-        ajax = new Ajax.Request("levels/"+name+"/level.json", {
-            method:'get',
-            data: null,
-            requestHeaders: {Accept: 'application/json'},
-            onSuccess: function(transport){
-                this.level = transport.responseText.evalJSON(); // <-- loads level to memory
-//                new PeriodicalExecuter(function(pe) { // stage 'loop'
-//                    this.renderStage(); // renders stage
-//                }.bind(this), this.step);
-            }.bind(this)
-        });
-        return this.level;
+        this.level = this.parent.loadJson("levels/"+name+"/level.json");
+        this.room = 0;
+        this.renderStage();
+
     },
 
     buildStage: function(name) {
@@ -42,6 +39,17 @@ var stage = Class.create({
         this.canvasName = name;
 
         return this;
+    },
+
+    renderActors: function(actors)
+    {
+
+        actors.each(function(e) {
+
+            this.draw(e.charPath + e.data.sprite['down'][0], e.x, e.y);
+
+        }.bind(this));
+
     },
 
     renderStage: function()
@@ -59,10 +67,19 @@ var stage = Class.create({
 
             var y=0;
 
-            e.split("").each(function(c) {
+            e.split("").each(function(c) { // loop left to right
 
-                if(tiles[c] == undefined) alert(c + ',' + x + ', ' + y);
-                this.draw(this.levelsPath+name+"/"+tiles[c], y*this.block, x*this.block);
+                var url;
+
+                if(tiles[c]) { // doorways are numbers
+                    url = this.levelsPath+name+"/"+tiles[c]; // rest of level
+                } else {
+                    url = this.levelsPath+name+"/"+tiles[' ']; // doorway
+                    this.spawnPointY = x*this.block;
+                    this.spawnPointX = y*this.block;
+                }
+
+                this.draw(url, y*this.block, x*this.block);
                 y++;
 
             }.bind(this));
@@ -70,6 +87,21 @@ var stage = Class.create({
         x++;
 
         }.bind(this));
+
+    },
+
+    isMovable: function(x, y) {
+
+        var xx = this.toBlock(x);
+        var yy = this.toBlock(y);
+        var yyy = this.level.levels[this.room][yy];
+        if(yyy.charAt(xx) == " " || !isNaN(yyy.charAt(xx))) return true; else return false;
+
+    },
+
+    toBlock: function(xy) {
+
+        return Math.floor(xy / this.block);
 
     },
 
@@ -85,4 +117,5 @@ var stage = Class.create({
 
         return this;
     }
+
 });
