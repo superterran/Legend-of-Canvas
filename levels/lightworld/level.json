@@ -1,14 +1,22 @@
 {
-    "name": "dungeon",
-
-
+    "name": "lightworld",
 
     "tiles":
     {
-        " ":    "tile-floor.jpg",
-        "r":    "tile-wall.jpg",
-        "g":    "firepit.png"
+        " ":    "floor",
+        "r":    "border",
+        "g":    "bush"
     },
+
+    "sprite":"sprite.gif",
+
+    "sprites":
+    {
+        "floor":{ "x":"0", "xx":"17", "y":"112", "yy":"17", "w":"50", "h":"50" },
+        "border":{ "x":"47", "xx":"17", "y":"80", "yy":"17", "w":"50", "h":"50" },
+        "bush":{ "x":"0", "xx":"17", "y":"80", "yy":"17", "w":"50", "h":"50" }
+    },
+
 
     "levels":
     {

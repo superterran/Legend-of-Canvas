@@ -14,7 +14,7 @@ var engine = Class.create({
         this.load(); //new stage(name, this);
         this.stage = new stage(name, this);
 
-        this.stage.load('dungeon');
+        this.stage.load('lightworld');
 
         this.actors[0] = new actor('link', this);
 

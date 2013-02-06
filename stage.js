@@ -138,16 +138,43 @@ var stage = Class.create({
         return Math.floor(xy / this.block);
     },
 
-    draw: function(imgurl, x, y) {
+    draw: function(imgurl, nx, ny) {
 
-        img = document.createElement('img');
-        // console.log(imgurl);
-        img.src = imgurl;
-        img.onload = function() {
+        var url = imgurl.split('/');
+
+        lvl = this.level;
+        if(lvl.sprite && url[0] == 'levels') {
+
+            var url = imgurl.split('/');
+            if(url[0] == 'levels') {
+                var param = this.level.sprites[url[2]];
+
+                img = document.createElement('img');
+                // console.log(imgurl);
+
+                var src = url[0] + '/' + url[1] + '/' + this.level.sprite;
+                img.src = src;
+//                console.log(src);
+                img.onload = function() {
+                    img.src = src;
+                    $('game').getContext('2d').drawImage(img, param.x, param.y, param.xx, param.yy, nx, ny, param.w, param.h);
+                }
+
+
+               // console.log(this.level.sprites[url[2]]);
+            }
+
+        } else {
+
+            img = document.createElement('img');
+            // console.log(imgurl);
             img.src = imgurl;
-            $('game').getContext('2d').drawImage(img, x,y);
-        }
+            img.onload = function() {
+                img.src = imgurl;
+                $('game').getContext('2d').drawImage(img, nx,ny);
+            }
 
+        }
         return this;
     }
 
