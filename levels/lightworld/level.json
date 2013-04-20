@@ -5,7 +5,8 @@
     {
         " ":    "floor",
         "r":    "border",
-        "g":    "bush"
+        "g":    "bush",
+        "a":    "hole-side"
     },
 
     "sprite":"sprite.gif",
@@ -14,22 +15,33 @@
     {
         "floor":{ "x":"0", "xx":"17", "y":"112", "yy":"17", "w":"50", "h":"50" },
         "border":{ "x":"47", "xx":"17", "y":"80", "yy":"17", "w":"50", "h":"50" },
-        "bush":{ "x":"0", "xx":"17", "y":"80", "yy":"17", "w":"50", "h":"50" }
+        "bush":{ "x":"0", "xx":"17", "y":"80", "yy":"17", "w":"50", "h":"50" },
+        "hole-side":{ "x":"64", "xx":"17", "y":"80", "yy":"17", "w":"50", "h":"50" },
+        "hole-floor":{ "x":"64", "xx":"17", "y":"80", "yy":"17", "w":"50", "h":"50" }
     },
 
 
     "levels":
     {
         "0":[
-            "rrrrrrrrrrrrr",
-            "r           r",
-            "r  g     g  r",
-            "r           r",
-            "3     g     r",
-            "r           r",
-            "r  g  0  g  r",
-            "r           r",
-            "rrrrrr1rrrrrr"
+            "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+            "r                            r",
+            "r  g     g                   r",
+            "r                            r",
+            "3     g          q           r",
+            "r  g     g                   r",
+            "r                            r",
+            "r                            r",
+            "r  g     g                   r",
+            "r                            r",
+            "r                            r",
+            "r                            r",
+            "r  g     g                   r",
+            "a                            r",
+            "a                            r",
+            "a  g  0  g                   r",
+            "a                            r",
+            "rrrrrr1rrrrrrrrrrrrrrrrrrrrrrr"
         ],
 
         "1":[

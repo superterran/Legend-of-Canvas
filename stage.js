@@ -2,8 +2,8 @@
 var stage = Class.create({
 
     block: 50,
-    height: 9,
-    width: 13,
+    height: 18,
+    width: 30,
     level: null,
     room: null,
     lastRoom: null,
