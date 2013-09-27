@@ -74,10 +74,10 @@ var actor = Class.create({
     loadActions: function() {
 
         this.actions['stop']    = function(){ this.orient_x = 0; /* no action */ }.bind(this);
-        this.actions['up']      = function(){ this.orient = 'up'; var y = this.y - this.speed; if(this.canMove(this.x, y)){ this.y = y }}.bind(this);
-        this.actions['down']    = function(){ this.orient = 'down'; var y = this.y + this.speed; if(this.canMove(this.x, y)){ this.y = y }}.bind(this);
-        this.actions['left']    = function(){ this.orient = 'left'; var x = this.x - this.speed; if(this.canMove(x, this.y)){ this.x = x }}.bind(this);
-        this.actions['right']   = function(){ this.orient = 'right'; var x = this.x + this.speed; if(this.canMove(x, this.y)){ this.x = x }}.bind(this);
+        this.actions['u+0057']      = function(){ this.orient = 'up'; var y = this.y - this.speed; if(this.canMove(this.x, y)){ this.y = y }}.bind(this);
+        this.actions['u+0053']    = function(){ this.orient = 'down'; var y = this.y + this.speed; if(this.canMove(this.x, y)){ this.y = y }}.bind(this);
+        this.actions['u+0041']    = function(){ this.orient = 'left'; var x = this.x - this.speed; if(this.canMove(x, this.y)){ this.x = x }}.bind(this);
+        this.actions['u+0044']   = function(){ this.orient = 'right'; var x = this.x + this.speed; if(this.canMove(x, this.y)){ this.x = x }}.bind(this);
         this.actions['wasd']    = function(){
             this.action = 'stop';
             Event.observe(document, 'keydown', function(event){
