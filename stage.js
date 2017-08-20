@@ -25,7 +25,7 @@ var stage = Class.create({
 
     load: function(name) {
 
-        this.level = this.parent.loadJson("levels/"+name+"/level.js");
+        this.level = this.parent.loadJson(this.levelsPath+name+"/level.js");
         this.room = 0;
         this.lastRoom = 0;
         this.renderStage();
