@@ -1,3 +1,6 @@
+var stage = Class.create({
+level:     
+    
 {
     "name": "dungeon",
 
@@ -61,3 +64,4 @@
 
     }
 }
+});
