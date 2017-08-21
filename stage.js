@@ -86,8 +86,8 @@ var stage = Class.create({
                 "r           r",
                 "rrrrrr2rrrrrr"
             ]
-
-
+            
+        }
         }
             
         this.room = 0;
