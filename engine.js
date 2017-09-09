@@ -40,6 +40,7 @@ var engine = Class.create({
 
         ajax = new Ajax.Request(url, {
             asynchronous:false,
+            type: "get", //send it through get method
             requestHeaders: {Accept: '*/*'}
         });
 
