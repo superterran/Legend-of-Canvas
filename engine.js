@@ -40,7 +40,7 @@ var engine = Class.create({
 
         ajax = new Ajax.Request(url, {
             asynchronous:false,
-            requestHeaders: {Accept: 'application/json'}
+            requestHeaders: {Accept: '*/*'}
         });
 
         return ajax.transport.responseText.evalJSON();
